@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>мій дашборд</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e10;--surface:#17171a;--surface2:#1f1f23;
+  --border:#2a2a30;--border2:#38383f;
+  --text:#f0eff4;--muted:#7a7987;--hint:#4a4958;
+  --accent:#7f77dd;--warn:#ba7517;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px 14px 48px}
+header{max-width:980px;margin:0 auto 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:20px;font-weight:500;letter-spacing:-.3px}
+.header-right{display:flex;align-items:center;gap:10px}
+.meta{font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
+.btn-add-block{font-size:12px;padding:5px 12px;background:transparent;border:0.5px solid var(--border2);border-radius:8px;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-add-block:hover{border-color:var(--text);color:var(--text)}
+.priority-wrap{max-width:980px;margin:0 auto 10px}
+.grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.block{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:opacity .2s,transform .2s}
+.block.priority-block{border-color:var(--warn)}
+.block.dragging{opacity:.4;transform:scale(.98)}
+.block.drag-over{border-color:var(--accent)}
+.block-top{padding:12px 13px 9px;border-bottom:0.5px solid var(--border)}
+.block-head{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.drag-handle{cursor:grab;color:var(--hint);font-size:14px;flex-shrink:0;padding:0 2px;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.block-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;flex:1}
+.block-icon{width:25px;height:25px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.pct{font-size:11px;color:var(--muted);font-weight:400}
+.head-actions{display:flex;gap:5px}
+.add-btn{width:24px;height:24px;background:transparent;border:0.5px solid var(--border2);border-radius:6px;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.add-btn:hover{border-color:var(--text);color:var(--text)}
+.del-block-btn{width:24px;height:24px;background:transparent;border:0.5px solid var(--border2);border-radius:6px;color:var(--hint);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.del-block-btn:hover{border-color:#e24b4a;color:#e24b4a}
+.bar-wrap{height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.tasks{padding:5px 7px;flex:1;min-height:44px}
+.task{display:flex;align-items:flex-start;gap:7px;padding:5px 5px;border-radius:7px;transition:background .1s}
+.task:hover{background:var(--surface2)}
+.task input[type=checkbox]{margin-top:2px;flex-shrink:0;cursor:pointer;accent-color:var(--accent);width:13px;height:13px}
+.tinfo{flex:1;min-width:0}
+.ttext{font-size:12px;line-height:1.45;color:var(--text);word-break:break-word}
+.ttext.done{text-decoration:line-through;color:var(--hint)}
+.tmeta{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10px;padding:1px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+.tag-date{background:#ba751720;color:#ba7517}
+.tag-budget{background:#1d9e7520;color:#1d9e75}
+.tag-priority{background:#7f77dd20;color:#9990e8}
+.tcomment{font-size:11px;color:var(--muted);margin-top:2px;font-style:italic;line-height:1.4;word-break:break-word}
+.star-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:1px 2px;flex-shrink:0;opacity:.2;transition:opacity .15s;line-height:1;margin-top:1px}
+.star-btn.on{opacity:1}
+.star-btn:hover{opacity:.7}
+.del{opacity:0;font-size:11px;color:var(--hint);cursor:pointer;padding:1px 3px;flex-shrink:0;line-height:1.5;transition:opacity .1s}
+.task:hover .del{opacity:1}
+.del:hover{color:var(--muted)}
+.empty{font-size:12px;color:var(--hint);text-align:center;padding:10px 0}
+.inp-area{border-top:0.5px solid var(--border);padding:7px 9px 9px}
+.inp{width:100%;font-size:12px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:7px;padding:5px 9px;color:var(--text);outline:none;transition:border-color .15s;margin-bottom:5px}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--hint)}
+.extra-fields{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px}
+.inp-sm{font-size:11px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.inp-sm:focus{border-color:var(--accent)}
+.inp-sm::placeholder{color:var(--hint)}
+.inp-comment{width:100%;font-size:11px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);outline:none;transition:border-color .15s;margin-bottom:5px;resize:none}
+.inp-comment:focus{border-color:var(--accent)}
+.inp-comment::placeholder{color:var(--hint)}
+.save{font-size:11px;padding:4px 10px;background:transparent;border:0.5px solid var(--border2);border-radius:6px;color:var(--muted);cursor:pointer;transition:all .15s}
+.save:hover{border-color:var(--text);color:var(--text)}
+.p-item{display:flex;align-items:flex-start;gap:8px;padding:6px 5px;border-radius:7px;transition:background .1s}
+.p-item:hover{background:var(--surface2)}
+.p-num{font-size:11px;color:var(--warn);font-weight:500;min-width:16px;margin-top:2px;flex-shrink:0}
+.p-body{flex:1;min-width:0}
+.p-text{font-size:12px;color:var(--text);line-height:1.4;word-break:break-word}
+.p-src{font-size:10px;color:var(--hint);margin-top:2px}
+.p-del{font-size:11px;color:var(--hint);cursor:pointer;opacity:.3;padding:1px 3px;flex-shrink:0;transition:opacity .1s}
+.p-item:hover .p-del{opacity:1}
+.p-del:hover{color:var(--muted)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:20px;width:300px;max-width:90vw}
+.modal h2{font-size:15px;font-weight:500;margin-bottom:14px}
+.modal-inp{width:100%;font-size:13px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);outline:none;margin-bottom:10px}
+.modal-inp:focus{border-color:var(--accent)}
+.modal-inp::placeholder{color:var(--hint)}
+.emoji-pick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ep{font-size:18px;cursor:pointer;padding:4px;border-radius:6px;border:1.5px solid transparent;transition:border-color .1s}
+.ep.sel{border-color:var(--accent)}
+.ep:hover{border-color:var(--border2)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-btn{font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--muted);transition:all .15s}
+.modal-btn:hover{border-color:var(--text);color:var(--text)}
+.modal-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.modal-btn.primary:hover{opacity:.85}
+@media(max-width:480px){
+  .grid{grid-template-columns:1fr}
+  header{flex-direction:column;align-items:flex-start}
+  .meta{text-align:left}
+  .extra-fields{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>мій дашборд</h1>
+  <div class="header-right">
+    <button class="btn-add-block" onclick="openModal()">+ блок</button>
+    <div class="meta" id="meta"></div>
+  </div>
+</header>
+
+<div class="priority-wrap" id="priority-wrap"></div>
+<div class="grid" id="grid"></div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h2>новий блок</h2>
+    <input class="modal-inp" id="modal-name" placeholder="назва блоку…" onkeydown="if(event.key==='Enter')confirmModal()"/>
+    <div class="emoji-pick" id="emoji-pick"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal()">скасувати</button>
+      <button class="modal-btn primary" onclick="confirmModal()">створити</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMOJIS=['🎯','🏃','🚗','📚','⚡','✨','👨‍👩‍👦','💑','💪','🧠','💼','🏠','💰','🎵','✈️','🌱','🔧','📱','❤️','🎓'];
+const COLORS=['#7f77dd','#1d9e75','#378add','#d85a30','#ba7517','#d4537e','#639922','#993556','#185fa5','#0f6e56'];
+
+const DEFAULT_BLOCKS=[
+  {id:'health', label:'здоровʼя',   icon:'🏃', color:'#1d9e75'},
+  {id:'car',    label:'машина',     icon:'🚗', color:'#378add'},
+  {id:'growth', label:'розвиток',   icon:'📚', color:'#d85a30'},
+  {id:'moment1',label:'момент 1',   icon:'⚡', color:'#ba7517'},
+  {id:'moment2',label:'момент 2',   icon:'✨', color:'#d4537e'},
+  {id:'parents',label:'батьки',     icon:'👨‍👩‍👦', color:'#639922'},
+  {id:'girl',   label:'дівчина',    icon:'💑', color:'#d4537e'},
+];
+
+function blocksKey(){return'db_blocks_v2'}
+function lsKey(id){return'tasks_v2_'+id}
+function pKey(){return'priorities_v2'}
+
+function loadBlocks(){
+  try{
+    const r=localStorage.getItem(blocksKey());
+    if(r)return JSON.parse(r);
+  }catch{}
+  localStorage.setItem(blocksKey(),JSON.stringify(DEFAULT_BLOCKS));
+  return DEFAULT_BLOCKS;
+}
+function saveBlocks(b){try{localStorage.setItem(blocksKey(),JSON.stringify(b))}catch{}}
+function loadTasks(id){try{const r=localStorage.getItem(lsKey(id));return r?JSON.parse(r):[]}catch{return[]}}
+function saveTasks(id,t){try{localStorage.setItem(lsKey(id),JSON.stringify(t))}catch{}}
+function loadP(){try{const r=localStorage.getItem(pKey());return r?JSON.parse(r):[]}catch{return[]}}
+function saveP(p){try{localStorage.setItem(pKey(),JSON.stringify(p))}catch{}}
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function getLabelById(id){const b=loadBlocks().find(b=>b.id===id);return b?b.label:id}
+
+let selectedEmoji=EMOJIS[0];
+let colorIdx=0;
+
+function openModal(){
+  selectedEmoji=EMOJIS[0];
+  colorIdx=Math.floor(Math.random()*COLORS.length);
+  document.getElementById('modal-name').value='';
+  const pick=document.getElementById('emoji-pick');
+  pick.innerHTML='';
+  EMOJIS.forEach(e=>{
+    const s=document.createElement('span');
+    s.className='ep'+(e===selectedEmoji?' sel':'');
+    s.textContent=e;
+    s.onclick=()=>{selectedEmoji=e;document.querySelectorAll('.ep').forEach(x=>x.classList.remove('sel'));s.classList.add('sel')};
+    pick.appendChild(s);
+  });
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-name').focus(),100);
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open')}
+
+function confirmModal(){
+  const name=document.getElementById('modal-name').value.trim();
+  if(!name)return;
+  const blocks=loadBlocks();
+  const id='block_'+Date.now();
+  blocks.push({id,label:name,icon:selectedEmoji,color:COLORS[colorIdx%COLORS.length]});
+  saveBlocks(blocks);
+  closeModal();
+  rebuildGrid();
+}
+
+document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+function renderPriority(){
+  const wrap=document.getElementById('priority-wrap');
+  const items=loadP();
+  wrap.innerHTML='';
+  const block=document.createElement('div');
+  block.className='block priority-block';
+  block.innerHTML=`
+    <div class="block-top">
+      <div class="block-head">
+        <div class="block-name">
+          <div class="block-icon" style="background:#ba751722">⭐</div>
+          пріоритети
+          <span class="pct">${items.length?items.length+' задач':''}</span>
+        </div>
+      </div>
+    </div>
+    <div class="tasks" id="p-tasks"></div>
+    <div class="inp-area">
+      <input class="inp" id="p-inp" placeholder="додати пріоритет вручну…" onkeydown="if(event.key==='Enter')addPriority()"/>
+      <button class="save" onclick="addPriority()">додати</button>
+    </div>
+  `;
+  wrap.appendChild(block);
+  const ct=document.getElementById('p-tasks');
+  if(!items.length){ct.innerHTML='<div class="empty">поки порожньо — став ⭐ на задачу або пиши вручну</div>';return;}
+  items.forEach((item,i)=>{
+    const row=document.createElement('div');
+    row.className='p-item';
+    row.innerHTML=`
+      <div class="p-num">${i+1}</div>
+      <div class="p-body">
+        <div class="p-text">${esc(item.text)}</div>
+        <div class="p-src">${item.blockId?'← '+getLabelById(item.blockId)+(item.date?' · до '+esc(item.date):''):'← вручну'}</div>
+      </div>
+      <span class="p-del" onclick="removePriority(${i},'${item.blockId||''}',${item.taskIdx!==undefined?item.taskIdx:-1})">✕</span>
+    `;
+    ct.appendChild(row);
+  });
+}
+
+function addPriority(){
+  const inp=document.getElementById('p-inp');
+  const text=(inp.value||'').trim();
+  if(!text)return;
+  const items=loadP();
+  items.push({text});
+  saveP(items);
+  inp.value='';
+  renderPriority();
+}
+
+function removePriority(i,blockId,taskIdx){
+  const items=loadP();
+  items.splice(i,1);
+  saveP(items);
+  if(blockId&&taskIdx>=0){
+    const tasks=loadTasks(blockId);
+    if(tasks[taskIdx]){tasks[taskIdx].priority=false;saveTasks(blockId,tasks);}
+    renderBlock(blockId);
+  }
+  renderPriority();
+}
+
+function renderBlock(id){
+  const blocks=loadBlocks();
+  const block=blocks.find(b=>b.id===id);
+  if(!block)return;
+  const tasks=loadTasks(id);
+  const ct=document.getElementById('t_'+id);
+  if(!ct)return;
+  const done=tasks.filter(t=>t.done).length;
+  const total=tasks.length;
+  const pct=total?Math.round(done/total*100):0;
+  const fill=document.getElementById('f_'+id);
+  if(fill)fill.style.width=pct+'%';
+  const pctEl=document.getElementById('pct_'+id);
+  if(pctEl)pctEl.textContent=total?pct+'%':'';
+  if(!tasks.length){ct.innerHTML='<div class="empty">поки порожньо</div>';return;}
+  ct.innerHTML='';
+  tasks.forEach((t,i)=>{
+    const row=document.createElement('div');
+    row.className='task';
+    let metaHtml='';
+    if(t.date||t.budget||t.priority){
+      metaHtml='<div class="tmeta">';
+      if(t.date)metaHtml+=`<span class="tag tag-date">📅 ${esc(t.date)}</span>`;
+      if(t.budget)metaHtml+=`<span class="tag tag-budget">💰 ${esc(t.budget)}</span>`;
+      if(t.priority)metaHtml+=`<span class="tag tag-priority">⭐ пріоритет</span>`;
+      metaHtml+='</div>';
+    }
+    const comm=t.comment?`<div class="tcomment">${esc(t.comment)}</div>`:'';
+    row.innerHTML=`
+      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${id}',${i})"/>
+      <div class="tinfo">
+        <div class="ttext${t.done?' done':''}">${esc(t.text)}</div>
+        ${comm}${metaHtml}
+      </div>
+      <button class="star-btn${t.priority?' on':''}" onclick="togglePriority('${id}',${i})" title="у пріоритети">⭐</button>
+      <span class="del" onclick="delTask('${id}',${i})">✕</span>
+    `;
+    ct.appendChild(row);
+  });
+}
+
+function toggleTask(id,i){
+  const tasks=loadTasks(id);
+  if(tasks[i])tasks[i].done=!tasks[i].done;
+  saveTasks(id,tasks);
+  renderBlock(id);
+}
+
+function togglePriority(id,i){
+  const tasks=loadTasks(id);
+  if(!tasks[i])return;
+  const t=tasks[i];
+  const priorities=loadP();
+  if(t.priority){
+    t.priority=false;
+    const idx=priorities.findIndex(p=>p.blockId===id&&p.taskIdx===i);
+    if(idx>=0)priorities.splice(idx,1);
+  } else {
+    t.priority=true;
+    priorities.push({text:t.text,blockId:id,taskIdx:i,date:t.date||''});
+  }
+  saveTasks(id,tasks);
+  saveP(priorities);
+  renderBlock(id);
+  renderPriority();
+}
+
+function delTask(id,i){
+  const tasks=loadTasks(id);
+  if(tasks[i]&&tasks[i].priority){
+    const priorities=loadP();
+    const idx=priorities.findIndex(p=>p.blockId===id&&p.taskIdx===i);
+    if(idx>=0)priorities.splice(idx,1);
+    saveP(priorities);
+  }
+  tasks.splice(i,1);
+  saveTasks(id,tasks);
+  renderBlock(id);
+  renderPriority();
+}
+
+function addTask(id){
+  const inp=document.getElementById('i_'+id);
+  const dateI=document.getElementById('d_'+id);
+  const budgetI=document.getElementById('b_'+id);
+  const commentI=document.getElementById('c_'+id);
+  const text=(inp&&inp.value||'').trim();
+  if(!text)return;
+  const tasks=loadTasks(id);
+  tasks.push({text,date:(dateI&&dateI.value)||'',budget:(budgetI&&budgetI.value)||'',comment:(commentI&&commentI.value)||'',done:false,priority:false});
+  saveTasks(id,tasks);
+  inp.value='';
+  if(dateI)dateI.value='';
+  if(budgetI)budgetI.value='';
+  if(commentI)commentI.value='';
+  renderBlock(id);
+}
+
+function deleteBlock(id){
+  if(!confirm('Видалити блок разом із задачами?'))return;
+  const blocks=loadBlocks().filter(b=>b.id!==id);
+  saveBlocks(blocks);
+  localStorage.removeItem(lsKey(id));
+  const priorities=loadP().filter(p=>p.blockId!==id);
+  saveP(priorities);
+  rebuildGrid();
+  renderPriority();
+}
+
+let dragSrc=null;
+
+function buildBlockEl(b){
+  const div=document.createElement('div');
+  div.className='block';
+  div.dataset.id=b.id;
+  div.draggable=true;
+  div.innerHTML=`
+    <div class="block-top">
+      <div class="block-head">
+        <span class="drag-handle" title="перетягнути">⠿</span>
+        <div class="block-name">
+          <div class="block-icon" style="background:${b.color}22">${b.icon}</div>
+          ${esc(b.label)}
+          <span class="pct" id="pct_${b.id}"></span>
+        </div>
+        <div class="head-actions">
+          <button class="add-btn" onclick="document.getElementById('i_${b.id}').focus()" aria-label="додати">+</button>
+          <button class="del-block-btn" onclick="deleteBlock('${b.id}')" title="видалити блок">✕</button>
+        </div>
+      </div>
+      <div class="bar-wrap"><div class="bar-fill" id="f_${b.id}" style="background:${b.color};width:0%"></div></div>
+    </div>
+    <div class="tasks" id="t_${b.id}"></div>
+    <div class="inp-area">
+      <input class="inp" id="i_${b.id}" placeholder="нова задача…" onkeydown="if(event.key==='Enter')addTask('${b.id}')"/>
+      <div class="extra-fields">
+        <input class="inp-sm" id="d_${b.id}" placeholder="📅 термін"/>
+        <input class="inp-sm" id="b_${b.id}" placeholder="💰 бюджет"/>
+      </div>
+      <textarea class="inp-comment" id="c_${b.id}" placeholder="💬 коментар…" rows="1"></textarea>
+      <button class="save" onclick="addTask('${b.id}')">додати</button>
+    </div>
+  `;
+  div.addEventListener('dragstart',e=>{dragSrc=div;div.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+  div.addEventListener('dragend',()=>{div.classList.remove('dragging');document.querySelectorAll('.block').forEach(b=>b.classList.remove('drag-over'))});
+  div.addEventListener('dragover',e=>{e.preventDefault();if(div!==dragSrc)div.classList.add('drag-over')});
+  div.addEventListener('dragleave',()=>div.classList.remove('drag-over'));
+  div.addEventListener('drop',e=>{
+    e.preventDefault();
+    div.classList.remove('drag-over');
+    if(!dragSrc||dragSrc===div)return;
+    const grid=document.getElementById('grid');
+    const children=[...grid.children];
+    const fromIdx=children.indexOf(dragSrc);
+    const toIdx=children.indexOf(div);
+    if(fromIdx<0||toIdx<0)return;
+    if(fromIdx<toIdx)grid.insertBefore(dragSrc,div.nextSibling);
+    else grid.insertBefore(dragSrc,div);
+    const newOrder=[...grid.children].map(el=>el.dataset.id);
+    const blocks=loadBlocks();
+    const sorted=newOrder.map(id=>blocks.find(b=>b.id===id)).filter(Boolean);
+    saveBlocks(sorted);
+  });
+  return div;
+}
+
+function rebuildGrid(){
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  loadBlocks().forEach(b=>{
+    const el=buildBlockEl(b);
+    grid.appendChild(el);
+    renderBlock(b.id);
+  });
+}
+
+rebuildGrid();
+renderPriority();
+
+const mons=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+const ds=['неділя','понеділок','вівторок','середа','четвер','пʼятниця','субота'];
+const now=new Date();
+document.getElementById('meta').textContent=ds[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()];
+</script>
+</body>
+</html>
