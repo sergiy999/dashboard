@@ -7,18 +7,29 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0e0e10;--surface:#17171a;--surface2:#1f1f23;
-  --border:#2a2a30;--border2:#38383f;
-  --text:#f0eff4;--muted:#7a7987;--hint:#4a4958;
-  --accent:#7f77dd;--warn:#ba7517;
+  --bg:#121016;--surface:#1c1a22;--surface2:#262430;
+  --border:#322f3b;--border2:#403c4a;
+  --text:#f5f3f7;--muted:#9089a0;--hint:#5c5668;
+  --accent:#9c8cff;--warn:#ff9f43;--racered:#e8334a;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px 14px 48px}
-header{max-width:980px;margin:0 auto 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-header h1{font-size:20px;font-weight:500;letter-spacing:-.3px}
-.header-right{display:flex;align-items:center;gap:10px}
-.meta{font-size:12px;color:var(--muted);text-align:right;line-height:1.6}
-.btn-add-block{font-size:12px;padding:5px 12px;background:transparent;border:0.5px solid var(--border2);border-radius:8px;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
-.btn-add-block:hover{border-color:var(--text);color:var(--text)}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:
+    radial-gradient(circle at 15% 0%, #3a1f4d 0%, transparent 45%),
+    radial-gradient(circle at 85% 10%, #1f2f5c 0%, transparent 45%),
+    linear-gradient(180deg,#161320 0%,#0e0c14 100%);
+  background-attachment:fixed;
+  color:var(--text);min-height:100vh;padding:20px 14px 48px
+}
+.hero{max-width:980px;margin:0 auto 18px;display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#1c1626 0%,#221830 100%);border:0.5px solid var(--border);border-radius:18px;padding:14px 18px;overflow:hidden;position:relative}
+.hero-car{width:130px;flex-shrink:0}
+.hero-text{flex:1;min-width:0}
+.hero-text h1{font-size:21px;font-weight:500;letter-spacing:-.3px}
+.hero-text .sub{font-size:12px;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.btn-add-block{font-size:12px;padding:6px 13px;background:var(--racered);border:none;border-radius:8px;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:500}
+.btn-add-block:hover{opacity:.88}
+.meta{font-size:11px;color:var(--muted);text-align:right;line-height:1.6}
 .priority-wrap{max-width:980px;margin:0 auto 10px}
 .grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
 .block{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:opacity .2s,transform .2s}
@@ -40,7 +51,7 @@ header h1{font-size:20px;font-weight:500;letter-spacing:-.3px}
 .bar-wrap{height:2px;background:var(--border);border-radius:2px;overflow:hidden}
 .bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
 .tasks{padding:5px 7px;flex:1;min-height:44px}
-.task{display:flex;align-items:flex-start;gap:7px;padding:5px 5px;border-radius:7px;transition:background .1s}
+.task{display:flex;align-items:flex-start;gap:7px;padding:5px 5px;border-radius:7px;transition:background .1s;cursor:pointer}
 .task:hover{background:var(--surface2)}
 .task input[type=checkbox]{margin-top:2px;flex-shrink:0;cursor:pointer;accent-color:var(--accent);width:13px;height:13px}
 .tinfo{flex:1;min-width:0}
@@ -48,10 +59,12 @@ header h1{font-size:20px;font-weight:500;letter-spacing:-.3px}
 .ttext.done{text-decoration:line-through;color:var(--hint)}
 .tmeta{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap;align-items:center}
 .tag{font-size:10px;padding:1px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
-.tag-date{background:#ba751720;color:#ba7517}
-.tag-budget{background:#1d9e7520;color:#1d9e75}
-.tag-priority{background:#7f77dd20;color:#9990e8}
+.tag-date{background:#ff9f4322;color:#ff9f43}
+.tag-budget{background:#3ecf8e22;color:#3ecf8e}
+.tag-priority{background:#9c8cff22;color:#b3a5ff}
 .tcomment{font-size:11px;color:var(--muted);margin-top:2px;font-style:italic;line-height:1.4;word-break:break-word}
+.tlink{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--accent);margin-top:2px;text-decoration:none;word-break:break-all}
+.tlink:hover{text-decoration:underline}
 .star-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:1px 2px;flex-shrink:0;opacity:.2;transition:opacity .15s;line-height:1;margin-top:1px}
 .star-btn.on{opacity:1}
 .star-btn:hover{opacity:.7}
@@ -70,6 +83,9 @@ header h1{font-size:20px;font-weight:500;letter-spacing:-.3px}
 .inp-comment{width:100%;font-size:11px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text);outline:none;transition:border-color .15s;margin-bottom:5px;resize:none}
 .inp-comment:focus{border-color:var(--accent)}
 .inp-comment::placeholder{color:var(--hint)}
+.inp-link{width:100%;font-size:11px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--accent);outline:none;transition:border-color .15s;margin-bottom:5px}
+.inp-link:focus{border-color:var(--accent)}
+.inp-link::placeholder{color:var(--hint)}
 .save{font-size:11px;padding:4px 10px;background:transparent;border:0.5px solid var(--border2);border-radius:6px;color:var(--muted);cursor:pointer;transition:all .15s}
 .save:hover{border-color:var(--text);color:var(--text)}
 .p-item{display:flex;align-items:flex-start;gap:8px;padding:6px 5px;border-radius:7px;transition:background .1s}
@@ -81,81 +97,143 @@ header h1{font-size:20px;font-weight:500;letter-spacing:-.3px}
 .p-del{font-size:11px;color:var(--hint);cursor:pointer;opacity:.3;padding:1px 3px;flex-shrink:0;transition:opacity .1s}
 .p-item:hover .p-del{opacity:1}
 .p-del:hover{color:var(--muted)}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center;padding:16px}
 .modal-bg.open{display:flex}
-.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:20px;width:300px;max-width:90vw}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:20px;width:320px;max-width:100%;box-shadow:0 12px 40px rgba(0,0,0,.45)}
 .modal h2{font-size:15px;font-weight:500;margin-bottom:14px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.modal-title{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.close-x{font-size:18px;color:var(--muted);cursor:pointer;line-height:1;padding:2px 4px}
+.close-x:hover{color:var(--text)}
 .modal-inp{width:100%;font-size:13px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);outline:none;margin-bottom:10px}
 .modal-inp:focus{border-color:var(--accent)}
 .modal-inp::placeholder{color:var(--hint)}
+.field-label{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;margin-top:10px}
+.field-label:first-child{margin-top:0}
+.field-inp{width:100%;font-size:13px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);outline:none}
+.field-inp:focus{border-color:var(--accent)}
+.field-inp.big{font-size:14px;font-weight:500;padding:8px 10px}
+.field-inp.link{color:var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .emoji-pick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .ep{font-size:18px;cursor:pointer;padding:4px;border-radius:6px;border:1.5px solid transparent;transition:border-color .1s}
 .ep.sel{border-color:var(--accent)}
 .ep:hover{border-color:var(--border2)}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-actions{display:flex;gap:8px;justify-content:space-between;margin-top:16px}
+.modal-actions.center{justify-content:flex-end}
 .modal-btn{font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--muted);transition:all .15s}
 .modal-btn:hover{border-color:var(--text);color:var(--text)}
 .modal-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .modal-btn.primary:hover{opacity:.85}
+.modal-btn.danger{color:#ff6b6b;border-color:#ff6b6b33}
+.modal-btn.danger:hover{background:#ff6b6b15;border-color:#ff6b6b}
 @media(max-width:480px){
   .grid{grid-template-columns:1fr}
-  header{flex-direction:column;align-items:flex-start}
-  .meta{text-align:left}
+  .hero{flex-direction:column;align-items:flex-start;text-align:left}
+  .hero-car{width:100px}
+  .header-actions{width:100%;justify-content:space-between}
   .extra-fields{grid-template-columns:1fr}
+  .row2{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>мій дашборд</h1>
-  <div class="header-right">
-    <button class="btn-add-block" onclick="openModal()">+ блок</button>
+<div class="hero">
+  <svg class="hero-car" viewBox="170 150 370 170" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(170,150)">
+      <rect x="0" y="60" width="14" height="50" rx="3" fill="#e8334a"/>
+      <rect x="326" y="60" width="14" height="50" rx="3" fill="#e8334a"/>
+      <path d="M0 95 L40 95 L60 70 L300 70 L320 95 L340 95 L340 105 L0 105 Z" fill="#e8334a"/>
+      <path d="M40 70 Q70 35 110 35 L230 35 Q270 35 300 70 L280 70 Q255 45 225 45 L115 45 Q85 45 60 70 Z" fill="#d12b40"/>
+      <rect x="100" y="30" width="140" height="18" rx="4" fill="#f04559"/>
+      <circle cx="170" cy="20" r="16" fill="#1a1a1a"/>
+      <circle cx="170" cy="20" r="16" fill="none" stroke="#f04559" stroke-width="2"/>
+      <rect x="160" y="10" width="20" height="7" rx="3" fill="#2a2a30"/>
+      <g fill="#161616"><circle cx="55" cy="108" r="26"/><circle cx="285" cy="108" r="26"/></g>
+      <g fill="#2a2a30"><circle cx="55" cy="108" r="11"/><circle cx="285" cy="108" r="11"/></g>
+      <g fill="#161616"><circle cx="55" cy="108" r="4"/><circle cx="285" cy="108" r="4"/></g>
+      <path d="M-22 64 L0 64 L0 90 L-22 86 Z" fill="#a81f30"/>
+      <path d="M340 64 L362 64 L362 86 L340 90 Z" fill="#a81f30"/>
+      <rect x="60" y="58" width="220" height="10" rx="2" fill="#c01f30"/>
+      <rect x="158" y="38" width="24" height="3" fill="#0e0e10"/>
+      <rect x="158" y="44" width="24" height="3" fill="#0e0e10"/>
+    </g>
+  </svg>
+  <div class="hero-text">
+    <h1>мій дашборд</h1>
+    <div class="sub">7 сфер життя · клікни задачу щоб відредагувати</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-add-block" onclick="openBlockModal()">+ блок</button>
     <div class="meta" id="meta"></div>
   </div>
-</header>
+</div>
 
 <div class="priority-wrap" id="priority-wrap"></div>
 <div class="grid" id="grid"></div>
 
-<div class="modal-bg" id="modal-bg">
+<div class="modal-bg" id="block-modal-bg">
   <div class="modal">
     <h2>новий блок</h2>
-    <input class="modal-inp" id="modal-name" placeholder="назва блоку…" onkeydown="if(event.key==='Enter')confirmModal()"/>
+    <input class="modal-inp" id="modal-name" placeholder="назва блоку…" onkeydown="if(event.key==='Enter')confirmBlockModal()"/>
     <div class="emoji-pick" id="emoji-pick"></div>
+    <div class="modal-actions center">
+      <button class="modal-btn" onclick="closeBlockModal()">скасувати</button>
+      <button class="modal-btn primary" onclick="confirmBlockModal()">створити</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="task-modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">редагування задачі</span>
+      <span class="close-x" onclick="closeTaskModal()">✕</span>
+    </div>
+    <div class="field-label">текст задачі</div>
+    <input class="field-inp big" id="et-text"/>
+    <div class="row2">
+      <div>
+        <div class="field-label">📅 термін</div>
+        <input class="field-inp" id="et-date"/>
+      </div>
+      <div>
+        <div class="field-label">💰 бюджет</div>
+        <input class="field-inp" id="et-budget"/>
+      </div>
+    </div>
+    <div class="field-label">💬 коментар</div>
+    <input class="field-inp" id="et-comment"/>
+    <div class="field-label">🔗 посилання</div>
+    <input class="field-inp link" id="et-link" placeholder="https://…"/>
     <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal()">скасувати</button>
-      <button class="modal-btn primary" onclick="confirmModal()">створити</button>
+      <button class="modal-btn danger" onclick="deleteFromModal()">видалити задачу</button>
+      <button class="modal-btn primary" onclick="saveFromModal()">зберегти</button>
     </div>
   </div>
 </div>
 
 <script>
-const EMOJIS=['🎯','🏃','🚗','📚','⚡','✨','👨‍👩‍👦','💑','💪','🧠','💼','🏠','💰','🎵','✈️','🌱','🔧','📱','❤️','🎓'];
-const COLORS=['#7f77dd','#1d9e75','#378add','#d85a30','#ba7517','#d4537e','#639922','#993556','#185fa5','#0f6e56'];
+const BACKUP = {"tasks_v2_girl":"[{\"text\":\"поїздка в гори з палатками\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"поїздка на сплав\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"інше місто\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"картинг\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"поїзда на велосипедах\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"Зробити пропозицію\",\"date\":\"30.08\",\"budget\":\"\",\"comment\":\"\\n\\nвибрати локацію та дату\\n\",\"done\":false,\"priority\":false}]","tasks_v2_parents":"[{\"text\":\"проводити час з ними\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"купити мамі телефон\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"поїхати кудись разом або подарити поїздку\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"подяка за всього шо дали\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false}]","tasks_v2_health":"[{\"text\":\"Зубний\",\"date\":\"15.07\",\"budget\":\"6000\",\"comment\":\"треба зробити три ошатні зуба\",\"done\":false,\"priority\":false},{\"text\":\"Верикоз на правій нозі\",\"date\":\"30.06\",\"budget\":\"2000\",\"comment\":\"обовчзково треба піти чим швидше\",\"done\":false,\"priority\":true}]","tasks_v2_growth":"[{\"text\":\"Вивчати нові страви\",\"date\":\"\",\"budget\":\"\",\"comment\":\"\",\"done\":false,\"priority\":false},{\"text\":\"знімати відео про кухню\",\"date\":\"постійно\",\"budget\":\"0\",\"comment\":\"1-2 відео тиждень вести тік так та інстанрам придумати формат\\n\",\"done\":false,\"priority\":false},{\"text\":\"новий продукт щоб летів страшно і нікого не було\",\"date\":\"30.07\",\"budget\":\"0\",\"comment\":\"обрати день на подумати \",\"done\":false,\"priority\":false},{\"text\":\"знімати відео з машинками хоч вілс+ едіти\",\"date\":\"постійно\",\"budget\":\"0\",\"comment\":\"розписати покроковий плвн + візитки зробити \\n\",\"done\":false,\"priority\":false},{\"text\":\"вест бізнес Lego активно\",\"date\":\"постйно\",\"budget\":\"500\",\"comment\":\"оновити телеграм та постити відео створити сайт \",\"done\":false,\"priority\":false},{\"text\":\"Створити проект по кухні даш борт\",\"date\":\"30.06\",\"budget\":\"0\",\"comment\":\"продумати та затеси логіку та збір інформації\",\"done\":false,\"priority\":false}]","priorities_v2":"[{\"text\":\"Верикоз на правій нозі\",\"blockId\":\"health\",\"taskIdx\":1,\"date\":\"30.06\"}]","db_blocks_v2":"[{\"id\":\"health\",\"label\":\"здоровʼя\",\"icon\":\"🏃\",\"color\":\"#1d9e75\"},{\"id\":\"growth\",\"label\":\"розвиток\",\"icon\":\"📚\",\"color\":\"#d85a30\"},{\"id\":\"moment1\",\"label\":\"момент 1\",\"icon\":\"⚡\",\"color\":\"#ba7517\"},{\"id\":\"moment2\",\"label\":\"момент 2\",\"icon\":\"✨\",\"color\":\"#d4537e\"},{\"id\":\"car\",\"label\":\"машина\",\"icon\":\"🚗\",\"color\":\"#378add\"},{\"id\":\"parents\",\"label\":\"батьки\",\"icon\":\"👨‍👩‍👦\",\"color\":\"#639922\"},{\"id\":\"girl\",\"label\":\"дівчина\",\"icon\":\"💑\",\"color\":\"#d4537e\"}]","tasks_v2_moment1":"[{\"text\":\"допрацювати стажера\",\"date\":\"30.08\",\"budget\":\"\",\"comment\":\"https://styager1.netlify.app\",\"done\":false,\"priority\":false}]"};
+Object.keys(BACKUP).forEach(k=>{if(!localStorage.getItem(k))localStorage.setItem(k,BACKUP[k])});
 
+const EMOJIS=['🎯','🏃','🚗','📚','⚡','✨','👨‍👩‍👦','💑','💪','🧠','💼','🏠','💰','🎵','✈️','🌱','🔧','📱','❤️','🎓'];
+const COLORS=['#9c8cff','#1d9e75','#378add','#d85a30','#ff9f43','#d4537e','#639922','#993556','#185fa5','#0f6e56'];
 const DEFAULT_BLOCKS=[
-  {id:'health', label:'здоровʼя',   icon:'🏃', color:'#1d9e75'},
-  {id:'car',    label:'машина',     icon:'🚗', color:'#378add'},
-  {id:'growth', label:'розвиток',   icon:'📚', color:'#d85a30'},
-  {id:'moment1',label:'момент 1',   icon:'⚡', color:'#ba7517'},
-  {id:'moment2',label:'момент 2',   icon:'✨', color:'#d4537e'},
-  {id:'parents',label:'батьки',     icon:'👨‍👩‍👦', color:'#639922'},
-  {id:'girl',   label:'дівчина',    icon:'💑', color:'#d4537e'},
+  {id:'health',label:'здоровʼя',icon:'🏃',color:'#1d9e75'},
+  {id:'car',label:'машина',icon:'🚗',color:'#378add'},
+  {id:'growth',label:'розвиток',icon:'📚',color:'#d85a30'},
+  {id:'moment1',label:'момент 1',icon:'⚡',color:'#ff9f43'},
+  {id:'moment2',label:'момент 2',icon:'✨',color:'#d4537e'},
+  {id:'parents',label:'батьки',icon:'👨‍👩‍👦',color:'#639922'},
+  {id:'girl',label:'дівчина',icon:'💑',color:'#d4537e'},
 ];
 
 function blocksKey(){return'db_blocks_v2'}
 function lsKey(id){return'tasks_v2_'+id}
 function pKey(){return'priorities_v2'}
-
-function loadBlocks(){
-  try{
-    const r=localStorage.getItem(blocksKey());
-    if(r)return JSON.parse(r);
-  }catch{}
-  localStorage.setItem(blocksKey(),JSON.stringify(DEFAULT_BLOCKS));
-  return DEFAULT_BLOCKS;
-}
+function loadBlocks(){try{const r=localStorage.getItem(blocksKey());if(r)return JSON.parse(r);}catch{}localStorage.setItem(blocksKey(),JSON.stringify(DEFAULT_BLOCKS));return DEFAULT_BLOCKS;}
 function saveBlocks(b){try{localStorage.setItem(blocksKey(),JSON.stringify(b))}catch{}}
 function loadTasks(id){try{const r=localStorage.getItem(lsKey(id));return r?JSON.parse(r):[]}catch{return[]}}
 function saveTasks(id,t){try{localStorage.setItem(lsKey(id),JSON.stringify(t))}catch{}}
@@ -163,124 +241,102 @@ function loadP(){try{const r=localStorage.getItem(pKey());return r?JSON.parse(r)
 function saveP(p){try{localStorage.setItem(pKey(),JSON.stringify(p))}catch{}}
 function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
 function getLabelById(id){const b=loadBlocks().find(b=>b.id===id);return b?b.label:id}
+function normalizeUrl(u){if(!u)return'';return(/^https?:\/\//i.test(u))?u:'https://'+u;}
 
-let selectedEmoji=EMOJIS[0];
-let colorIdx=0;
-
-function openModal(){
-  selectedEmoji=EMOJIS[0];
-  colorIdx=Math.floor(Math.random()*COLORS.length);
+let selectedEmoji=EMOJIS[0],colorIdx=0;
+function openBlockModal(){
+  selectedEmoji=EMOJIS[0];colorIdx=Math.floor(Math.random()*COLORS.length);
   document.getElementById('modal-name').value='';
-  const pick=document.getElementById('emoji-pick');
-  pick.innerHTML='';
-  EMOJIS.forEach(e=>{
-    const s=document.createElement('span');
-    s.className='ep'+(e===selectedEmoji?' sel':'');
-    s.textContent=e;
-    s.onclick=()=>{selectedEmoji=e;document.querySelectorAll('.ep').forEach(x=>x.classList.remove('sel'));s.classList.add('sel')};
-    pick.appendChild(s);
-  });
-  document.getElementById('modal-bg').classList.add('open');
+  const pick=document.getElementById('emoji-pick');pick.innerHTML='';
+  EMOJIS.forEach(e=>{const s=document.createElement('span');s.className='ep'+(e===selectedEmoji?' sel':'');s.textContent=e;s.onclick=()=>{selectedEmoji=e;document.querySelectorAll('.ep').forEach(x=>x.classList.remove('sel'));s.classList.add('sel')};pick.appendChild(s)});
+  document.getElementById('block-modal-bg').classList.add('open');
   setTimeout(()=>document.getElementById('modal-name').focus(),100);
 }
-
-function closeModal(){document.getElementById('modal-bg').classList.remove('open')}
-
-function confirmModal(){
-  const name=document.getElementById('modal-name').value.trim();
-  if(!name)return;
-  const blocks=loadBlocks();
-  const id='block_'+Date.now();
+function closeBlockModal(){document.getElementById('block-modal-bg').classList.remove('open')}
+function confirmBlockModal(){
+  const name=document.getElementById('modal-name').value.trim();if(!name)return;
+  const blocks=loadBlocks();const id='block_'+Date.now();
   blocks.push({id,label:name,icon:selectedEmoji,color:COLORS[colorIdx%COLORS.length]});
-  saveBlocks(blocks);
-  closeModal();
-  rebuildGrid();
+  saveBlocks(blocks);closeBlockModal();rebuildGrid();
 }
+document.getElementById('block-modal-bg').addEventListener('click',function(e){if(e.target===this)closeBlockModal()});
 
-document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal()});
+let editCtx=null;
+function openTaskModal(blockId,idx){
+  const tasks=loadTasks(blockId);const t=tasks[idx];if(!t)return;
+  editCtx={blockId,idx};
+  document.getElementById('et-text').value=t.text||'';
+  document.getElementById('et-date').value=t.date||'';
+  document.getElementById('et-budget').value=t.budget||'';
+  document.getElementById('et-comment').value=t.comment||'';
+  document.getElementById('et-link').value=t.link||'';
+  document.getElementById('task-modal-bg').classList.add('open');
+}
+function closeTaskModal(){document.getElementById('task-modal-bg').classList.remove('open');editCtx=null}
+function saveFromModal(){
+  if(!editCtx)return;
+  const tasks=loadTasks(editCtx.blockId);const t=tasks[editCtx.idx];if(!t)return;
+  t.text=document.getElementById('et-text').value.trim()||t.text;
+  t.date=document.getElementById('et-date').value;
+  t.budget=document.getElementById('et-budget').value;
+  t.comment=document.getElementById('et-comment').value;
+  t.link=document.getElementById('et-link').value;
+  saveTasks(editCtx.blockId,tasks);
+  if(t.priority){
+    const priorities=loadP();
+    const pi=priorities.findIndex(p=>p.blockId===editCtx.blockId&&p.taskIdx===editCtx.idx);
+    if(pi>=0){priorities[pi].text=t.text;priorities[pi].date=t.date;saveP(priorities);}
+  }
+  renderBlock(editCtx.blockId);renderPriority();closeTaskModal();
+}
+function deleteFromModal(){
+  if(!editCtx)return;
+  delTask(editCtx.blockId,editCtx.idx);
+  closeTaskModal();
+}
+document.getElementById('task-modal-bg').addEventListener('click',function(e){if(e.target===this)closeTaskModal()});
 
 function renderPriority(){
-  const wrap=document.getElementById('priority-wrap');
-  const items=loadP();
-  wrap.innerHTML='';
-  const block=document.createElement('div');
-  block.className='block priority-block';
+  const wrap=document.getElementById('priority-wrap');const items=loadP();wrap.innerHTML='';
+  const block=document.createElement('div');block.className='block priority-block';
   block.innerHTML=`
     <div class="block-top">
       <div class="block-head">
-        <div class="block-name">
-          <div class="block-icon" style="background:#ba751722">⭐</div>
-          пріоритети
-          <span class="pct">${items.length?items.length+' задач':''}</span>
-        </div>
+        <div class="block-name"><div class="block-icon" style="background:#ff9f4322">⭐</div>пріоритети<span class="pct">${items.length?items.length+' задач':''}</span></div>
       </div>
     </div>
     <div class="tasks" id="p-tasks"></div>
     <div class="inp-area">
       <input class="inp" id="p-inp" placeholder="додати пріоритет вручну…" onkeydown="if(event.key==='Enter')addPriority()"/>
       <button class="save" onclick="addPriority()">додати</button>
-    </div>
-  `;
+    </div>`;
   wrap.appendChild(block);
   const ct=document.getElementById('p-tasks');
   if(!items.length){ct.innerHTML='<div class="empty">поки порожньо — став ⭐ на задачу або пиши вручну</div>';return;}
   items.forEach((item,i)=>{
-    const row=document.createElement('div');
-    row.className='p-item';
-    row.innerHTML=`
-      <div class="p-num">${i+1}</div>
-      <div class="p-body">
-        <div class="p-text">${esc(item.text)}</div>
-        <div class="p-src">${item.blockId?'← '+getLabelById(item.blockId)+(item.date?' · до '+esc(item.date):''):'← вручну'}</div>
-      </div>
-      <span class="p-del" onclick="removePriority(${i},'${item.blockId||''}',${item.taskIdx!==undefined?item.taskIdx:-1})">✕</span>
-    `;
+    const row=document.createElement('div');row.className='p-item';
+    row.innerHTML=`<div class="p-num">${i+1}</div><div class="p-body"><div class="p-text">${esc(item.text)}</div><div class="p-src">${item.blockId?'← '+getLabelById(item.blockId)+(item.date?' · до '+esc(item.date):''):'← вручну'}</div></div><span class="p-del" onclick="removePriority(${i},'${item.blockId||''}',${item.taskIdx!==undefined?item.taskIdx:-1})">✕</span>`;
     ct.appendChild(row);
   });
 }
-
-function addPriority(){
-  const inp=document.getElementById('p-inp');
-  const text=(inp.value||'').trim();
-  if(!text)return;
-  const items=loadP();
-  items.push({text});
-  saveP(items);
-  inp.value='';
-  renderPriority();
-}
-
+function addPriority(){const inp=document.getElementById('p-inp');const text=(inp.value||'').trim();if(!text)return;const items=loadP();items.push({text});saveP(items);inp.value='';renderPriority();}
 function removePriority(i,blockId,taskIdx){
-  const items=loadP();
-  items.splice(i,1);
-  saveP(items);
-  if(blockId&&taskIdx>=0){
-    const tasks=loadTasks(blockId);
-    if(tasks[taskIdx]){tasks[taskIdx].priority=false;saveTasks(blockId,tasks);}
-    renderBlock(blockId);
-  }
+  const items=loadP();items.splice(i,1);saveP(items);
+  if(blockId&&taskIdx>=0){const tasks=loadTasks(blockId);if(tasks[taskIdx]){tasks[taskIdx].priority=false;saveTasks(blockId,tasks);}renderBlock(blockId);}
   renderPriority();
 }
 
 function renderBlock(id){
-  const blocks=loadBlocks();
-  const block=blocks.find(b=>b.id===id);
-  if(!block)return;
   const tasks=loadTasks(id);
-  const ct=document.getElementById('t_'+id);
-  if(!ct)return;
-  const done=tasks.filter(t=>t.done).length;
-  const total=tasks.length;
-  const pct=total?Math.round(done/total*100):0;
-  const fill=document.getElementById('f_'+id);
-  if(fill)fill.style.width=pct+'%';
-  const pctEl=document.getElementById('pct_'+id);
-  if(pctEl)pctEl.textContent=total?pct+'%':'';
+  const ct=document.getElementById('t_'+id);if(!ct)return;
+  const done=tasks.filter(t=>t.done).length,total=tasks.length,pct=total?Math.round(done/total*100):0;
+  const fill=document.getElementById('f_'+id);if(fill)fill.style.width=pct+'%';
+  const pctEl=document.getElementById('pct_'+id);if(pctEl)pctEl.textContent=total?pct+'%':'';
   if(!tasks.length){ct.innerHTML='<div class="empty">поки порожньо</div>';return;}
   ct.innerHTML='';
   tasks.forEach((t,i)=>{
-    const row=document.createElement('div');
-    row.className='task';
+    const row=document.createElement('div');row.className='task';
+    row.onclick=function(e){if(e.target.tagName==='INPUT'||e.target.classList.contains('star-btn')||e.target.classList.contains('del'))return;openTaskModal(id,i)};
     let metaHtml='';
     if(t.date||t.budget||t.priority){
       metaHtml='<div class="tmeta">';
@@ -289,104 +345,61 @@ function renderBlock(id){
       if(t.priority)metaHtml+=`<span class="tag tag-priority">⭐ пріоритет</span>`;
       metaHtml+='</div>';
     }
-    const comm=t.comment?`<div class="tcomment">${esc(t.comment)}</div>`:'';
+    const comm=t.comment&&!t.comment.startsWith('http')?`<div class="tcomment">${esc(t.comment)}</div>`:'';
+    const linkUrl=t.link?normalizeUrl(t.link):(t.comment&&t.comment.startsWith('http')?t.comment:'');
+    const linkHtml=linkUrl?`<a class="tlink" href="${esc(linkUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 ${esc(linkUrl.replace(/^https?:\/\//,''))}</a>`:'';
     row.innerHTML=`
-      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${id}',${i})"/>
+      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${id}',${i})" onclick="event.stopPropagation()"/>
       <div class="tinfo">
         <div class="ttext${t.done?' done':''}">${esc(t.text)}</div>
-        ${comm}${metaHtml}
+        ${comm}${linkHtml}${metaHtml}
       </div>
-      <button class="star-btn${t.priority?' on':''}" onclick="togglePriority('${id}',${i})" title="у пріоритети">⭐</button>
-      <span class="del" onclick="delTask('${id}',${i})">✕</span>
-    `;
+      <button class="star-btn${t.priority?' on':''}" onclick="event.stopPropagation();togglePriority('${id}',${i})" title="у пріоритети">⭐</button>
+      <span class="del" onclick="event.stopPropagation();delTask('${id}',${i})">✕</span>`;
     ct.appendChild(row);
   });
 }
-
-function toggleTask(id,i){
-  const tasks=loadTasks(id);
-  if(tasks[i])tasks[i].done=!tasks[i].done;
-  saveTasks(id,tasks);
-  renderBlock(id);
-}
-
+function toggleTask(id,i){const tasks=loadTasks(id);if(tasks[i])tasks[i].done=!tasks[i].done;saveTasks(id,tasks);renderBlock(id);}
 function togglePriority(id,i){
-  const tasks=loadTasks(id);
-  if(!tasks[i])return;
-  const t=tasks[i];
-  const priorities=loadP();
-  if(t.priority){
-    t.priority=false;
-    const idx=priorities.findIndex(p=>p.blockId===id&&p.taskIdx===i);
-    if(idx>=0)priorities.splice(idx,1);
-  } else {
-    t.priority=true;
-    priorities.push({text:t.text,blockId:id,taskIdx:i,date:t.date||''});
-  }
-  saveTasks(id,tasks);
-  saveP(priorities);
-  renderBlock(id);
-  renderPriority();
+  const tasks=loadTasks(id);if(!tasks[i])return;const t=tasks[i];const priorities=loadP();
+  if(t.priority){t.priority=false;const idx=priorities.findIndex(p=>p.blockId===id&&p.taskIdx===i);if(idx>=0)priorities.splice(idx,1);}
+  else{t.priority=true;priorities.push({text:t.text,blockId:id,taskIdx:i,date:t.date||''});}
+  saveTasks(id,tasks);saveP(priorities);renderBlock(id);renderPriority();
 }
-
 function delTask(id,i){
   const tasks=loadTasks(id);
-  if(tasks[i]&&tasks[i].priority){
-    const priorities=loadP();
-    const idx=priorities.findIndex(p=>p.blockId===id&&p.taskIdx===i);
-    if(idx>=0)priorities.splice(idx,1);
-    saveP(priorities);
-  }
-  tasks.splice(i,1);
-  saveTasks(id,tasks);
-  renderBlock(id);
-  renderPriority();
+  if(tasks[i]&&tasks[i].priority){const priorities=loadP();const idx=priorities.findIndex(p=>p.blockId===id&&p.taskIdx===i);if(idx>=0)priorities.splice(idx,1);saveP(priorities);}
+  tasks.splice(i,1);saveTasks(id,tasks);renderBlock(id);renderPriority();
 }
-
 function addTask(id){
   const inp=document.getElementById('i_'+id);
   const dateI=document.getElementById('d_'+id);
   const budgetI=document.getElementById('b_'+id);
   const commentI=document.getElementById('c_'+id);
-  const text=(inp&&inp.value||'').trim();
-  if(!text)return;
+  const linkI=document.getElementById('l_'+id);
+  const text=(inp&&inp.value||'').trim();if(!text)return;
   const tasks=loadTasks(id);
-  tasks.push({text,date:(dateI&&dateI.value)||'',budget:(budgetI&&budgetI.value)||'',comment:(commentI&&commentI.value)||'',done:false,priority:false});
+  tasks.push({text,date:(dateI&&dateI.value)||'',budget:(budgetI&&budgetI.value)||'',comment:(commentI&&commentI.value)||'',link:(linkI&&linkI.value)||'',done:false,priority:false});
   saveTasks(id,tasks);
-  inp.value='';
-  if(dateI)dateI.value='';
-  if(budgetI)budgetI.value='';
-  if(commentI)commentI.value='';
+  inp.value='';if(dateI)dateI.value='';if(budgetI)budgetI.value='';if(commentI)commentI.value='';if(linkI)linkI.value='';
   renderBlock(id);
 }
-
 function deleteBlock(id){
   if(!confirm('Видалити блок разом із задачами?'))return;
-  const blocks=loadBlocks().filter(b=>b.id!==id);
-  saveBlocks(blocks);
+  const blocks=loadBlocks().filter(b=>b.id!==id);saveBlocks(blocks);
   localStorage.removeItem(lsKey(id));
-  const priorities=loadP().filter(p=>p.blockId!==id);
-  saveP(priorities);
-  rebuildGrid();
-  renderPriority();
+  const priorities=loadP().filter(p=>p.blockId!==id);saveP(priorities);
+  rebuildGrid();renderPriority();
 }
 
 let dragSrc=null;
-
 function buildBlockEl(b){
-  const div=document.createElement('div');
-  div.className='block';
-  div.dataset.id=b.id;
-  div.draggable=true;
+  const div=document.createElement('div');div.className='block';div.dataset.id=b.id;div.draggable=true;
   div.innerHTML=`
     <div class="block-top">
       <div class="block-head">
         <span class="drag-handle" title="перетягнути">⠿</span>
-        <div class="block-name">
-          <div class="block-icon" style="background:${b.color}22">${b.icon}</div>
-          ${esc(b.label)}
-          <span class="pct" id="pct_${b.id}"></span>
-        </div>
+        <div class="block-name"><div class="block-icon" style="background:${b.color}22">${b.icon}</div>${esc(b.label)}<span class="pct" id="pct_${b.id}"></span></div>
         <div class="head-actions">
           <button class="add-btn" onclick="document.getElementById('i_${b.id}').focus()" aria-label="додати">+</button>
           <button class="del-block-btn" onclick="deleteBlock('${b.id}')" title="видалити блок">✕</button>
@@ -402,49 +415,41 @@ function buildBlockEl(b){
         <input class="inp-sm" id="b_${b.id}" placeholder="💰 бюджет"/>
       </div>
       <textarea class="inp-comment" id="c_${b.id}" placeholder="💬 коментар…" rows="1"></textarea>
+      <input class="inp-link" id="l_${b.id}" placeholder="🔗 посилання (https://…)"/>
       <button class="save" onclick="addTask('${b.id}')">додати</button>
-    </div>
-  `;
+    </div>`;
   div.addEventListener('dragstart',e=>{dragSrc=div;div.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
   div.addEventListener('dragend',()=>{div.classList.remove('dragging');document.querySelectorAll('.block').forEach(b=>b.classList.remove('drag-over'))});
   div.addEventListener('dragover',e=>{e.preventDefault();if(div!==dragSrc)div.classList.add('drag-over')});
   div.addEventListener('dragleave',()=>div.classList.remove('drag-over'));
   div.addEventListener('drop',e=>{
-    e.preventDefault();
-    div.classList.remove('drag-over');
+    e.preventDefault();div.classList.remove('drag-over');
     if(!dragSrc||dragSrc===div)return;
     const grid=document.getElementById('grid');
     const children=[...grid.children];
-    const fromIdx=children.indexOf(dragSrc);
-    const toIdx=children.indexOf(div);
+    const fromIdx=children.indexOf(dragSrc),toIdx=children.indexOf(div);
     if(fromIdx<0||toIdx<0)return;
-    if(fromIdx<toIdx)grid.insertBefore(dragSrc,div.nextSibling);
-    else grid.insertBefore(dragSrc,div);
+    if(fromIdx<toIdx)grid.insertBefore(dragSrc,div.nextSibling);else grid.insertBefore(dragSrc,div);
     const newOrder=[...grid.children].map(el=>el.dataset.id);
     const blocks=loadBlocks();
-    const sorted=newOrder.map(id=>blocks.find(b=>b.id===id)).filter(Boolean);
-    saveBlocks(sorted);
+    saveBlocks(newOrder.map(id=>blocks.find(b=>b.id===id)).filter(Boolean));
   });
   return div;
 }
-
 function rebuildGrid(){
-  const grid=document.getElementById('grid');
-  grid.innerHTML='';
-  loadBlocks().forEach(b=>{
-    const el=buildBlockEl(b);
-    grid.appendChild(el);
-    renderBlock(b.id);
-  });
+  const grid=document.getElementById('grid');grid.innerHTML='';
+  loadBlocks().forEach(b=>{const el=buildBlockEl(b);grid.appendChild(el);renderBlock(b.id);});
 }
 
-rebuildGrid();
-renderPriority();
+rebuildGrid();renderPriority();
 
 const mons=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
 const ds=['неділя','понеділок','вівторок','середа','четвер','пʼятниця','субота'];
 const now=new Date();
 document.getElementById('meta').textContent=ds[now.getDay()]+', '+now.getDate()+' '+mons[now.getMonth()];
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTaskModal();closeBlockModal();}});
 </script>
 </body>
 </html>
+
