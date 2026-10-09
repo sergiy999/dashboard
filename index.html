@@ -33,6 +33,11 @@
   </div>
   <div class="header-actions">
     <button class="btn-add-block" onclick="openBlockModal()">+ блок</button>
+    <button class="btn-add-block" onclick="showSummary()">📊 підсумок</button>
+    <button class="btn-add-block" onclick="exportICS()">📅 в календар</button>
+    <button class="btn-add-block" onclick="exportData()">💾 експорт</button>
+    <button class="btn-add-block" onclick="document.getElementById('imp').click()">📂 імпорт</button>
+    <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(this)"/>
     <div class="meta" id="meta"></div>
   </div>
 </div>
@@ -88,6 +93,7 @@
 <script src="js/priority.js"></script>
 <script src="js/modals.js"></script>
 <script src="js/password-gate.js"></script>
+<script src="js/tools.js"></script>
 <script>
   restoreBackupIfEmpty();
   rebuildGrid();
