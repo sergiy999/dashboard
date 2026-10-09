@@ -1,0 +1,116 @@
+/* ── інструменти: експорт/імпорт, календар (.ics), тижневий підсумок ── */
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+function todayISO() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+function downloadFile(name, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* 1. збереження даних ─────────────────────────────────────────── */
+function exportData() {
+  const data = {};
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('tasks_v2_') || k === 'priorities_v2' || k === 'db_blocks_v2') data[k] = localStorage.getItem(k);
+  });
+  downloadFile('dashboard-' + todayISO() + '.json', JSON.stringify(data, null, 2), 'application/json');
+}
+
+function importData(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data.db_blocks_v2) throw new Error('це не файл дашборду');
+      if (!confirm('Замінити поточні дані даними з файлу?')) return;
+      Object.keys(data).forEach(k => {
+        if (k.startsWith('tasks_v2_') || k === 'priorities_v2' || k === 'db_blocks_v2') localStorage.setItem(k, data[k]);
+      });
+      rebuildGrid();
+      renderPriority();
+    } catch (e) { alert('Не вдалося імпортувати: ' + e.message); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+/* 2. нагадування через календар (.ics) ────────────────────────── */
+function icsEsc(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;'); }
+function icsFold(line) {
+  const out = [];
+  while (line.length > 74) { out.push(line.slice(0, 74)); line = ' ' + line.slice(74); }
+  out.push(line);
+  return out.join('\r\n');
+}
+function icsDate(iso, plusDays) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d + (plusDays || 0));
+  return dt.getFullYear() + pad2(dt.getMonth() + 1) + pad2(dt.getDate());
+}
+
+function exportICS() {
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//dashboard//UK', 'CALSCALE:GREGORIAN'];
+  let count = 0;
+  loadBlocks().forEach(b => {
+    loadTasks(b.id).forEach((t, i) => {
+      if (!t.date || t.done) return;
+      count++;
+      lines.push(
+        'BEGIN:VEVENT',
+        'UID:' + b.id + '-' + i + '-' + t.date + '@dashboard',
+        'DTSTAMP:' + stamp,
+        'DTSTART;VALUE=DATE:' + icsDate(t.date),
+        'DTEND;VALUE=DATE:' + icsDate(t.date, 1),
+        'SUMMARY:' + icsEsc((t.priority ? '⭐ ' : '') + t.text),
+        'DESCRIPTION:' + icsEsc(b.label + (t.comment ? ' — ' + t.comment : '') + (t.link ? '\n' + t.link : '')),
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEsc(t.text), 'TRIGGER:PT9H', 'END:VALARM',
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Завтра: ' + icsEsc(t.text), 'TRIGGER:-PT15H', 'END:VALARM',
+        'END:VEVENT'
+      );
+    });
+  });
+  lines.push('END:VCALENDAR');
+  if (!count) { alert('Немає невиконаних задач із терміном.'); return; }
+  downloadFile('dashboard.ics', lines.map(icsFold).join('\r\n'), 'text/calendar');
+}
+
+/* 4. підсумок ─────────────────────────────────────────────────── */
+function showSummary() {
+  const today = todayISO();
+  const week = new Date(); week.setDate(week.getDate() + 7);
+  const weekISO = week.getFullYear() + '-' + pad2(week.getMonth() + 1) + '-' + pad2(week.getDate());
+  let rows = '', over = [], soon = [], totalAll = 0, doneAll = 0;
+
+  loadBlocks().forEach(b => {
+    const tasks = loadTasks(b.id);
+    const done = tasks.filter(t => t.done).length;
+    totalAll += tasks.length; doneAll += done;
+    const stale = tasks.filter(t => !t.done && t.date && t.date < today);
+    stale.forEach(t => over.push(b.label + ': ' + t.text + ' (' + formatDateForDisplay(t.date) + ')'));
+    tasks.filter(t => !t.done && t.date && t.date >= today && t.date <= weekISO)
+      .forEach(t => soon.push(b.label + ': ' + t.text + ' (' + formatDateForDisplay(t.date) + ')'));
+    rows += `<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${b.icon} ${esc(b.label)}</span><span>${done}/${tasks.length}${stale.length ? ' · прострочено ' + stale.length : ''}</span></div>`;
+  });
+
+  const list = a => a.length ? a.map(x => `<div style="padding:3px 0">• ${esc(x)}</div>`).join('') : '<div style="opacity:.6">немає</div>';
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg open';
+  bg.onclick = e => { if (e.target === bg) bg.remove(); };
+  bg.innerHTML = `<div class="modal" style="max-height:85vh;overflow:auto">
+    <div class="modal-head"><span class="modal-title">підсумок · виконано ${doneAll}/${totalAll}</span><span class="close-x" id="sum-x">✕</span></div>
+    ${rows}
+    <div class="field-label" style="margin-top:14px">⏰ прострочено (${over.length})</div>${list(over)}
+    <div class="field-label" style="margin-top:14px">📅 найближчі 7 днів (${soon.length})</div>${list(soon)}
+  </div>`;
+  document.body.appendChild(bg);
+  document.getElementById('sum-x').onclick = () => bg.remove();
+}
