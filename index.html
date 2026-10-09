@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#eef1f7"/>
 <title>мій дашборд</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap&subset=cyrillic" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
@@ -36,8 +39,7 @@
     <button class="btn-add-block" onclick="showSummary()">📊 підсумок</button>
     <button class="btn-add-block" onclick="exportICS()">📅 в календар</button>
     <button class="btn-add-block" onclick="exportData()">💾 експорт</button>
-    <button class="btn-add-block" onclick="document.getElementById('imp').click()">📂 імпорт</button>
-    <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(this)"/>
+    <button class="btn-add-block" onclick="openImport()">📂 імпорт</button>
     <div class="meta" id="meta"></div>
   </div>
 </div>
