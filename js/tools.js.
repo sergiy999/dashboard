@@ -3,7 +3,45 @@
 function pad2(n) { return String(n).padStart(2, '0'); }
 function todayISO() { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
 
-function downloadFile(name, content, type) {
+const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+function openModalHtml(title, bodyHtml) {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg open';
+  bg.onclick = e => { if (e.target === bg) bg.remove(); };
+  bg.innerHTML = `<div class="modal" style="max-height:85vh;overflow:auto">
+    <div class="modal-head"><span class="modal-title">${title}</span><span class="close-x">✕</span></div>${bodyHtml}</div>`;
+  bg.querySelector('.close-x').onclick = () => bg.remove();
+  document.body.appendChild(bg);
+  return bg;
+}
+
+function showTextModal(title, text) {
+  const bg = openModalHtml(title, `<div class="field-label">скопіюй увесь текст і збережи (наприклад у Нотатки)</div>
+    <textarea class="field-inp" id="tm-ta" rows="8" style="width:100%"></textarea>
+    <div class="modal-actions"><button class="modal-btn primary" id="tm-copy">копіювати</button></div>`);
+  const ta = bg.querySelector('#tm-ta');
+  ta.value = text;
+  bg.querySelector('#tm-copy').onclick = () => {
+    ta.select(); ta.setSelectionRange(0, 999999999);
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).catch(() => document.execCommand('copy'));
+    bg.querySelector('#tm-copy').textContent = 'скопійовано ✓';
+  };
+}
+
+async function downloadFile(name, content, type) {
+  if (IS_MOBILE) {
+    try {
+      const file = new File([content], name, { type });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name });
+        return;
+      }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    if (type === 'text/calendar') { location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(content); return; }
+    showTextModal('копія даних', content);
+    return;
+  }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([content], { type }));
   a.download = name;
@@ -22,24 +60,33 @@ function exportData() {
   downloadFile('dashboard-' + todayISO() + '.json', JSON.stringify(data, null, 2), 'application/json');
 }
 
-function importData(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      if (!data.db_blocks_v2) throw new Error('це не файл дашборду');
-      if (!confirm('Замінити поточні дані даними з файлу?')) return;
-      Object.keys(data).forEach(k => {
-        if (k.startsWith('tasks_v2_') || k === 'priorities_v2' || k === 'db_blocks_v2') localStorage.setItem(k, data[k]);
-      });
-      rebuildGrid();
-      renderPriority();
-    } catch (e) { alert('Не вдалося імпортувати: ' + e.message); }
-    input.value = '';
+function applyImport(text) {
+  try {
+    const data = JSON.parse(text);
+    if (!data.db_blocks_v2) throw new Error('це не дані дашборду');
+    if (!confirm('Замінити поточні дані імпортованими?')) return false;
+    Object.keys(data).forEach(k => {
+      if (k.startsWith('tasks_v2_') || k === 'priorities_v2' || k === 'db_blocks_v2') localStorage.setItem(k, data[k]);
+    });
+    rebuildGrid();
+    renderPriority();
+    return true;
+  } catch (e) { alert('Не вдалося імпортувати: ' + e.message); return false; }
+}
+
+function openImport() {
+  const bg = openModalHtml('імпорт даних', `<div class="field-label">встав скопійований текст</div>
+    <textarea class="field-inp" id="im-ta" rows="6" style="width:100%"></textarea>
+    <div class="field-label" style="margin-top:10px">або вибери файл .json</div>
+    <input type="file" id="im-file" accept=".json,application/json"/>
+    <div class="modal-actions"><button class="modal-btn primary" id="im-go">імпортувати</button></div>`);
+  bg.querySelector('#im-go').onclick = () => { if (applyImport(bg.querySelector('#im-ta').value)) bg.remove(); };
+  bg.querySelector('#im-file').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { if (applyImport(r.result)) bg.remove(); };
+    r.readAsText(f);
   };
-  reader.readAsText(file);
 }
 
 /* 2. нагадування через календар (.ics) ────────────────────────── */
